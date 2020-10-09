@@ -18,6 +18,7 @@ import com.plcoding.spotifycloneyt.exoplayer.callbacks.MusicPlaybackPreparer
 import com.plcoding.spotifycloneyt.exoplayer.callbacks.MusicPlayerEventListener
 import com.plcoding.spotifycloneyt.exoplayer.callbacks.MusicPlayerNotificationListener
 import com.plcoding.spotifycloneyt.util.Constants.MEDIA_ROOT_ID
+import com.plcoding.spotifycloneyt.util.Constants.NETWORK_ERROR
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import javax.inject.Inject
@@ -28,7 +29,7 @@ private const val SERVICE_TAG = "MusicService"
 class MusicService : MediaBrowserServiceCompat() {
 
     @Inject
-    lateinit var datasourceFactory : DefaultDataSourceFactory
+    lateinit var datasourceFactory: DefaultDataSourceFactory
 
     @Inject
     lateinit var exoPlayer: SimpleExoPlayer
@@ -52,7 +53,7 @@ class MusicService : MediaBrowserServiceCompat() {
 
     private lateinit var musicPlayerEventListener: MusicPlayerEventListener
 
-    companion object{
+    companion object {
         var currSongDuration = 0L
             private set
     }
@@ -79,11 +80,11 @@ class MusicService : MediaBrowserServiceCompat() {
             this,
             mediaSession.sessionToken,
             MusicPlayerNotificationListener(this)
-        ){
+        ) {
             currSongDuration = exoPlayer.duration
         }
 
-        val musicPlaybackPreparer = MusicPlaybackPreparer(firebaseMusicSource){
+        val musicPlaybackPreparer = MusicPlaybackPreparer(firebaseMusicSource) {
             currPlayingSong = it
             preparePlayer(
                 firebaseMusicSource.songs,
@@ -102,7 +103,7 @@ class MusicService : MediaBrowserServiceCompat() {
         musicNotificationManager.showNotification(exoPlayer)
     }
 
-    private inner class MusicQueueNavigator: TimelineQueueNavigator( mediaSession){
+    private inner class MusicQueueNavigator : TimelineQueueNavigator(mediaSession) {
         override fun getMediaDescription(player: Player, windowIndex: Int): MediaDescriptionCompat {
             return firebaseMusicSource.songs[windowIndex].description
         }
@@ -112,7 +113,7 @@ class MusicService : MediaBrowserServiceCompat() {
         songs: List<MediaMetadataCompat>,
         itemToPlay: MediaMetadataCompat?,
         playNow: Boolean
-    ){
+    ) {
         val currSongIndex = if (currPlayingSong == null) 0 else songs.indexOf(itemToPlay)
         exoPlayer.prepare(firebaseMusicSource.asMediaSource(datasourceFactory))
         exoPlayer.seekTo(currSongIndex, 0L)
@@ -136,20 +137,25 @@ class MusicService : MediaBrowserServiceCompat() {
         parentId: String,
         result: Result<MutableList<MediaBrowserCompat.MediaItem>>
     ) {
-        when(parentId){
+        when (parentId) {
             MEDIA_ROOT_ID -> {
-                val resultsSent = firebaseMusicSource.whenReady {isInitialized ->
-                    if (isInitialized){
+                val resultsSent = firebaseMusicSource.whenReady { isInitialized ->
+                    if (isInitialized) {
                         result.sendResult(firebaseMusicSource.asMediaItems())
-                        if (!isPlayerInitialized && firebaseMusicSource.songs.isNotEmpty()){
-                            preparePlayer(firebaseMusicSource.songs, firebaseMusicSource.songs[0],false)
+                        if (!isPlayerInitialized && firebaseMusicSource.songs.isNotEmpty()) {
+                            preparePlayer(
+                                firebaseMusicSource.songs,
+                                firebaseMusicSource.songs[0],
+                                false
+                            )
                             isPlayerInitialized = true
                         }
-                    }else{
+                    } else {
+                        mediaSession.sendSessionEvent(NETWORK_ERROR, null)
                         result.sendResult(null)
                     }
                 }
-                if (!resultsSent){
+                if (!resultsSent) {
                     result.detach()
                 }
             }
