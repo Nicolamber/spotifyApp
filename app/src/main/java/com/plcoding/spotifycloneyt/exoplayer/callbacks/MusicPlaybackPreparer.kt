@@ -11,7 +11,7 @@ import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.plcoding.spotifycloneyt.exoplayer.FirebaseMusicSource
 
 class MusicPlaybackPreparer(
-    private val firebaseMusicSource : FirebaseMusicSource,
+    private val firebaseMusicSource: FirebaseMusicSource,
     private val playerPrepared: (MediaMetadataCompat?) -> Unit
 ) : MediaSessionConnector.PlaybackPreparer {
     override fun onPrepareFromSearch(query: String, playWhenReady: Boolean, extras: Bundle?) = Unit

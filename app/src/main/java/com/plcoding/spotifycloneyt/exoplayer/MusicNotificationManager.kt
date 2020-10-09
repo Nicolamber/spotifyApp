@@ -25,7 +25,7 @@ class MusicNotificationManager(
     private val notificationManager: PlayerNotificationManager
 
     init {
-        val mediaController = MediaControllerCompat(context,sessionToken)
+        val mediaController = MediaControllerCompat(context, sessionToken)
         notificationManager = PlayerNotificationManager.createWithNotificationChannel(
             context,
             NOTIFICATION_CHANNEL_ID,
@@ -40,13 +40,13 @@ class MusicNotificationManager(
         }
     }
 
-    fun showNotification(player: Player){
+    fun showNotification(player: Player) {
         notificationManager.setPlayer(player)
     }
 
     private inner class DescriptionAdapter(
         private val mediaController: MediaControllerCompat
-    ) : PlayerNotificationManager.MediaDescriptionAdapter{
+    ) : PlayerNotificationManager.MediaDescriptionAdapter {
         override fun createCurrentContentIntent(player: Player): PendingIntent? {
             return mediaController.sessionActivity
         }
@@ -65,7 +65,7 @@ class MusicNotificationManager(
         ): Bitmap? {
             Glide.with(context).asBitmap()
                 .load(mediaController.metadata.description.iconUri)
-                .into(object : CustomTarget<Bitmap>(){
+                .into(object : CustomTarget<Bitmap>() {
 
                     override fun onLoadCleared(placeholder: Drawable?) = Unit
 

@@ -17,11 +17,11 @@ import javax.inject.Inject
 
 class FirebaseMusicSource @Inject constructor(
     private val musicDatabase: MusicDatabase
-){
+) {
 
-     var songs = emptyList<MediaMetadataCompat>()
+    var songs = emptyList<MediaMetadataCompat>()
 
-    suspend fun fetchMediaData() = withContext(Dispatchers.IO){
+    suspend fun fetchMediaData() = withContext(Dispatchers.IO) {
         state = STATE_INITIALIZING
         val allSongs = musicDatabase.getAllSongs()
         songs = allSongs.map { song ->
@@ -50,16 +50,16 @@ class FirebaseMusicSource @Inject constructor(
         return concatenatingMediaSource
     }
 
-     fun asMediaItems() = songs.map { song ->
-         val desc = MediaDescriptionCompat.Builder()
-             .setMediaUri(song.getString(METADATA_KEY_MEDIA_URI).toUri())
-             .setTitle(song.description.title)
-             .setSubtitle(song.description.subtitle)
-             .setMediaId(song.description.mediaId)
-             .setIconUri(song.description.iconUri)
-             .build()
-         MediaBrowserCompat.MediaItem(desc, FLAG_PLAYABLE)
-     }.toMutableList()
+    fun asMediaItems() = songs.map { song ->
+        val desc = MediaDescriptionCompat.Builder()
+            .setMediaUri(song.getString(METADATA_KEY_MEDIA_URI).toUri())
+            .setTitle(song.description.title)
+            .setSubtitle(song.description.subtitle)
+            .setMediaId(song.description.mediaId)
+            .setIconUri(song.description.iconUri)
+            .build()
+        MediaBrowserCompat.MediaItem(desc, FLAG_PLAYABLE)
+    }.toMutableList()
 
     private val onReadyListeners = mutableListOf<(Boolean) -> Unit>()
 
@@ -78,10 +78,10 @@ class FirebaseMusicSource @Inject constructor(
         }
 
     fun whenReady(action: (Boolean) -> Unit): Boolean {
-        if (state == STATE_CREATED || state == STATE_INITIALIZING){
+        if (state == STATE_CREATED || state == STATE_INITIALIZING) {
             onReadyListeners += action
             return false
-        }else{
+        } else {
             action(state == STATE_INITIALIZED)
             return true
         }

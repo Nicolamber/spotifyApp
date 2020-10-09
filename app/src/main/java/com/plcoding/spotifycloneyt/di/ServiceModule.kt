@@ -15,7 +15,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.scopes.ServiceScoped
 
 @Module
-@InstallIn(ServiceComponent::class )
+@InstallIn(ServiceComponent::class)
 object ServiceModule {
 
     @ServiceScoped
